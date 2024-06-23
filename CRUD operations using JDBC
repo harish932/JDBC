@@ -1,0 +1,125 @@
+package com.tap;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class Project {
+	private static Connection con;
+	private static PreparedStatement pre;
+	private static ResultSet res;
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		String url = "jdbc:mysql://localhost:3306/jdbcclasses";
+		String username = "root";
+		String password = "root";
+		try {
+			con = DriverManager.getConnection(url,username,password);
+			do {
+				System.out.println("Enter Your Option To perform From the Given operations\n"+"  1.Insert\n"+"  2.Update\n"+"  3.Delete\n"+"  4.Display");
+				System.out.println("To Exit Press Any Other Number");
+				int ch = sc.nextInt();
+				if(ch==1) {
+					Insert();
+				} else if(ch==2) {
+					Update();
+				} else if(ch==3) {
+					Delete();
+				} else if(ch==4) {
+					Display();
+				} else {
+					System.out.println("Visit Again! ");
+					System.exit(1);
+				}
+				System.out.println();
+			}
+			while(true);
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				res.close();
+				pre.close();
+				con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	static void Insert() throws SQLException {
+		Scanner sc = new Scanner(System.in);
+		String SQL = "INSERT into employee (id,name,email,department,salary) values (?,?,?,?,?)";
+		 pre = con.prepareStatement(SQL);
+		 
+		 System.out.println(" please Enter ID: ");
+		 pre.setInt(1, sc.nextInt());
+		 sc.nextLine();
+		 
+		 System.out.println("Please Enter Name: ");
+		 pre.setString(2, sc.nextLine());
+		 
+		 System.out.println("Please Enter Email: ");
+		 pre.setString(3, sc.nextLine());
+		 
+		 System.out.println("Please Enter Department: ");
+		 pre.setString(4, sc.nextLine());
+		 
+		 System.out.println("Please Enter Salary: ");
+		 pre.setInt(5, sc.nextInt());
+		 
+		 int times = pre.executeUpdate();
+		 System.out.println(times+" Rows Inserted");
+		 
+	}
+	static void Update() throws SQLException {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Please Enter Column Name: ");
+		String col = sc.nextLine();
+		String up = "UPDATE employee set "+col+"= ? where id=?";
+		pre = con.prepareStatement(up);
+		if(col.equals("id") || col.equals("salary")) {
+			System.out.println("Please Enter Value : ");
+			pre.setInt(1, sc.nextInt());
+		} else {
+			System.out.println("Please Enter Value: ");
+			pre.setString(1, sc.nextLine());
+		}
+		System.out.println("Enter ID: ");
+		pre.setInt(2, sc.nextInt());
+		int times = pre.executeUpdate();
+		System.out.println(times+" Rows Inserted");
+	}
+	static void Delete() throws SQLException {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Please Enter, Which column Based Row You Nedd To Delete: ");
+		String col = sc.nextLine();
+		String del = "DELETE  from employee WHERE "+col+ "=?";
+		pre = con.prepareStatement(del);
+		if(col.equals("id") || col.equals("salary")) {
+			System.out.println("Please Enter Further Information To Proceed: ");
+			pre.setInt(1, sc.nextInt());
+		} else {
+			System.out.println("Please Enter Further Information To Proceed: ");
+			pre.setString(1, sc.nextLine());
+		}
+		int times = pre.executeUpdate();
+		System.out.println(times+" Rows Inserted");
+	}
+	static void Display() throws SQLException {
+		String SQL = "SELECT * from employee";
+		 Statement stmt = con.createStatement();
+		 res = stmt.executeQuery(SQL);
+		 while(res.next()) {
+			 System.out.printf("|%-3d |%-8s |%-20s |%-9s |%d|\n",res.getInt("id"),res.getString("name"), res.getString("email"), res.getString("department"),res.getInt("salary"));
+		 }
+		 System.out.println("+------------------------------------------------------+");
+		 
+	}
+
+}
